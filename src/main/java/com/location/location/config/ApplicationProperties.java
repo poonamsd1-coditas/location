@@ -6,31 +6,31 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApplicationProperties {
 
     private final FourSquare fourSquare = new FourSquare();
-//    private final GoogleGeocode google = new GoogleGeocode();
+    private final GoogleGeocode googleGeocode = new GoogleGeocode();
 
     public FourSquare getFourSquare() { return fourSquare; }
-//    public GoogleGeocode getGoogle() { return  google; }
+    public GoogleGeocode getGoogleGeocode() { return googleGeocode; }
 
-//    public static class GoogleGeocode {
-//        private String googleKey;
-//        private String apiPath;
-//
-//        public String getGoogleKey() {
-//            return googleKey;
-//        }
-//
-//        public void setGoogleKey(String googleKey) {
-//            this.googleKey = googleKey;
-//        }
-//
-//        public String getApiPath() {
-//            return apiPath;
-//        }
-//
-//        public void setApiPath(String apiPath) {
-//            this.apiPath = apiPath;
-//        }
-//    }
+    public static class GoogleGeocode {
+        private String googleKey;
+        private String apiPath;
+
+        public String getGoogleKey() {
+            return googleKey;
+        }
+
+        public void setGoogleKey(String googleKey) {
+            this.googleKey = googleKey;
+        }
+
+        public String getApiPath() {
+            return apiPath;
+        }
+
+        public void setApiPath(String apiPath) {
+            this.apiPath = apiPath;
+        }
+    }
 
     public static class FourSquare {
         private String clientId;

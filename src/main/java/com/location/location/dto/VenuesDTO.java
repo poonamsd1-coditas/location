@@ -6,6 +6,7 @@ public class VenuesDTO {
     String state;
     String country;
     String countryCode;
+    String postalCode;
     String address;
     String lat;
     String lng;
@@ -49,6 +50,14 @@ public class VenuesDTO {
 
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
     }
 
     public String getAddress() {

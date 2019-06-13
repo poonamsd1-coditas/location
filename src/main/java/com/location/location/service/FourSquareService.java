@@ -53,6 +53,8 @@ public class FourSquareService {
                 venuesDTO.setCountry(locationObject.getString("country"));
             if (locationObject.has("cc"))
                 venuesDTO.setCountryCode(locationObject.getString("cc"));
+            if (locationObject.has("postalCode"))
+                venuesDTO.setPostalCode(locationObject.getString("postalCode"));
             String address = "";
             for(int j = 0; j < locationObject.getJSONArray("formattedAddress").length(); j++)
                 address = address.concat(locationObject.getJSONArray("formattedAddress").getString(j) + " ");
