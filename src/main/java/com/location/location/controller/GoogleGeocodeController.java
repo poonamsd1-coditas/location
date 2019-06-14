@@ -1,5 +1,6 @@
 package com.location.location.controller;
 
+import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
 import com.location.location.service.GoogleGeocodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,8 @@ public class GoogleGeocodeController {
     private GoogleGeocodeService googleGeocodeService;
 
     @GetMapping("/getLocation")
-    public ResponseEntity<List<VenuesDTO>> getLocation(@RequestParam(value = "query", required = true) String query,
-                                                       @RequestParam(value = "filter", required = false) String filter) {
+    public ResponseEntity<CustomResponseDTO> getLocation(@RequestParam(value = "query", required = true) String query,
+                                                         @RequestParam(value = "filter", required = false) String filter) {
         return new ResponseEntity<>(googleGeocodeService.getLocation(query, filter), HttpStatus.OK);
     }
 }

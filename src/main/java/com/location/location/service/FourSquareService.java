@@ -1,6 +1,8 @@
 package com.location.location.service;
 
 import com.location.location.config.ApplicationProperties;
+import com.location.location.config.ErrorCodes;
+import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,7 +29,10 @@ public class FourSquareService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<VenuesDTO> getLocation(String query, String filter) {
+    public CustomResponseDTO getLocation(String query, String filter) {
+
+        CustomResponseDTO responseDTO = new CustomResponseDTO();
+
         String url = getFourSquareUrl();
         if (!query.isEmpty())
             url = url.concat("&near=" + query);
@@ -36,8 +41,17 @@ public class FourSquareService {
         if (filter != null && !filter.isEmpty())
             filterApplied = true;
         JSONObject dataJson = new JSONObject(getDataJson(url));
-        JSONObject responseJson = (JSONObject) dataJson.get("response");
 
+        JSONObject metaJson = (JSONObject) dataJson.get("meta");
+        if (!metaJson.get("code").toString().equals("200")) {
+            if (metaJson.getString("errorType").equals(ErrorCodes.INVALID_AUTH))
+                responseDTO.setError("Invalid FourSquare credentials");
+            else if (metaJson.getString("errorType").equals(ErrorCodes.FAILED_GEOCODE))
+                responseDTO.setError("FourSquare couldn't get geocode param");
+            return responseDTO;
+        }
+
+        JSONObject responseJson = (JSONObject) dataJson.get("response");
         JSONArray venuesArray = (JSONArray) responseJson.get("venues");
         List<VenuesDTO> venuesDTOList = new ArrayList<>();
         for (int i = 0; i < venuesArray.length(); i++) {
@@ -78,7 +92,8 @@ public class FourSquareService {
             venuesDTO.setCategory(categoryList);
             venuesDTOList.add(venuesDTO);
         }
-        return venuesDTOList;
+        responseDTO.setLocations(venuesDTOList);
+        return responseDTO;
     }
 
     private String getDataJson(String url) {

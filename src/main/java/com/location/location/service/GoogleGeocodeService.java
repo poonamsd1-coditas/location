@@ -1,6 +1,8 @@
 package com.location.location.service;
 
 import com.location.location.config.ApplicationProperties;
+import com.location.location.config.ErrorCodes;
+import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,14 +27,21 @@ public class GoogleGeocodeService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<VenuesDTO> getLocation(String query, String filter) {
+    public CustomResponseDTO getLocation(String query, String filter) {
         if (filter != null && !filter.isEmpty())
             query = query.concat(" " + filter);
         String url = getGoogleUrl();
         if (!query.isEmpty())
             url = url.concat("&address=" + query);
 
+        CustomResponseDTO responseDTO = new CustomResponseDTO();
         JSONObject dataJson = new JSONObject(getDataJson(url));
+        if (dataJson.has("error_message")) {
+            if (dataJson.getString("status").equals(ErrorCodes.GOOGLE_KEY_MISSING))
+                responseDTO.setError("Google Geocode API key is invalid");
+            return responseDTO;
+        }
+
         JSONArray resultArray = dataJson.getJSONArray("results");
         List<VenuesDTO> venuesDTOList = new ArrayList<>();
         for (int i = 0; i < resultArray.length(); i++) {
@@ -69,7 +78,8 @@ public class GoogleGeocodeService {
             }
             venuesDTOList.add(venuesDTO);
         }
-        return venuesDTOList;
+        responseDTO.setLocations(venuesDTOList);
+        return responseDTO;
     }
 
     private String getDataJson(String url) {
