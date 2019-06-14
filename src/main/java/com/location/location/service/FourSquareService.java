@@ -67,9 +67,9 @@ public class FourSquareService {
             boolean notFound = true;
             for (int j = 0; j < venueObject.getJSONArray("categories").length(); j++) {
                 String category = venueObject.getJSONArray("categories").getJSONObject(j).getString("name");
-                categoryList = categoryList.concat(category + " ");
+                categoryList = categoryList.concat(category);
                 if (j < venueObject.getJSONArray("categories").length() - 1)
-                    categoryList = categoryList.concat(",");
+                    categoryList = categoryList.concat(", ");
                 if (filterApplied && category.toLowerCase().contains(filter.toLowerCase()))
                     notFound = false;
             }
