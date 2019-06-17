@@ -2,6 +2,7 @@ package com.location.location;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.location.location.controller.LocationController;
 import com.location.location.dto.CustomResponseDTO;
+import com.location.location.dto.VenuesDTO;
 import com.location.location.service.LocationService;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -53,7 +54,7 @@ public class LocationServiceTest {
     }
 
     @Test
-    public void test_get_all_success() throws Exception {
+    public void test_status_ok() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/location/getLocation?query=pune"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -61,6 +62,37 @@ public class LocationServiceTest {
         String content = result.getResponse().getContentAsString();
         ObjectMapper mapper = new ObjectMapper();
         CustomResponseDTO responseDTO = mapper.readValue(content, CustomResponseDTO.class);
+        assertThat(responseDTO.getError() == null);
+        assertThat(responseDTO.getMessage().equals("Locations populated"));
         assertThat(!responseDTO.getLocations().isEmpty());
+    }
+
+    @Test
+    public void test_with_filter() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/location/getLocation?query=pune&filter=bank"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        ObjectMapper mapper = new ObjectMapper();
+        CustomResponseDTO responseDTO = mapper.readValue(content, CustomResponseDTO.class);
+        assertThat(responseDTO.getError() == null);
+        assertThat(responseDTO.getMessage().equals("Locations populated"));
+        assertThat(!responseDTO.getLocations().isEmpty());
+        for (VenuesDTO venuesDTO : responseDTO.getLocations()) {
+            assertThat(venuesDTO.getCategory().toLowerCase().contains("bank"));
+        }
+    }
+
+    @Test
+    public void test_empty_query() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/location/getLocation?query="))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        ObjectMapper mapper = new ObjectMapper();
+        CustomResponseDTO responseDTO = mapper.readValue(content, CustomResponseDTO.class);
+        assertThat(responseDTO.getError().equals("Query string is empty. Enter valid query"));
+        assertThat(responseDTO.getLocations() == null);
     }
 }

@@ -37,8 +37,6 @@ public class FourSquareService {
         String url = null;
         CustomResponseDTO responseDTO = new CustomResponseDTO();
         url = getFourSquareUrl().concat("&near=" + query);
-//        if (!query.isEmpty())
-//            url = url.concat("&near=" + query);
 
         boolean filterApplied = false;
         if (filter != null && !filter.isEmpty())

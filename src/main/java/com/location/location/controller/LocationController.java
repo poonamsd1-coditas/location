@@ -23,6 +23,12 @@ public class LocationController {
     @GetMapping("/getLocation")
     public ResponseEntity<CustomResponseDTO> getLocation(@RequestParam(value = "query", required = true) String query,
                                                          @RequestParam(value = "filter", required = false) String filter) {
+        if (query == null || query.isEmpty()) {
+            CustomResponseDTO responseDTO = new CustomResponseDTO();
+            responseDTO.setError("Query string is empty. Enter valid query");
+            responseDTO.setMessage("Locations not populated");
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(locationService.getLocation(query, filter), HttpStatus.OK);
     }
 
