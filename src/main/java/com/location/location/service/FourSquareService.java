@@ -4,7 +4,9 @@ import com.location.location.config.ApplicationProperties;
 import com.location.location.config.ErrorCodes;
 import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
+import com.sun.org.omg.CORBA.ExceptionDescriptionHelper;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
@@ -31,25 +34,24 @@ public class FourSquareService {
 
     public CustomResponseDTO getLocation(String query, String filter) {
 
+        String url = null;
         CustomResponseDTO responseDTO = new CustomResponseDTO();
-
-        String url = getFourSquareUrl();
-        if (!query.isEmpty())
-            url = url.concat("&near=" + query);
+        url = getFourSquareUrl().concat("&near=" + query);
+//        if (!query.isEmpty())
+//            url = url.concat("&near=" + query);
 
         boolean filterApplied = false;
         if (filter != null && !filter.isEmpty())
             filterApplied = true;
-        JSONObject dataJson = new JSONObject(getDataJson(url));
-
-        JSONObject metaJson = (JSONObject) dataJson.get("meta");
-        if (!metaJson.get("code").toString().equals("200")) {
-            if (metaJson.getString("errorType").equals(ErrorCodes.INVALID_AUTH))
-                responseDTO.setError("Invalid FourSquare credentials");
-            else if (metaJson.getString("errorType").equals(ErrorCodes.FAILED_GEOCODE))
-                responseDTO.setError("FourSquare couldn't get geocode param");
+        String dataUrl = null;
+        try {
+            dataUrl = getDataJson(url);
+        }catch (Exception e) {
+            responseDTO.setError("FourSquare couldn't get geocode param");
             return responseDTO;
         }
+
+        JSONObject dataJson = new JSONObject(dataUrl);
 
         JSONObject responseJson = (JSONObject) dataJson.get("response");
         JSONArray venuesArray = (JSONArray) responseJson.get("venues");

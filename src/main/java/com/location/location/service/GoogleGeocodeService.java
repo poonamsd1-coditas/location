@@ -35,12 +35,13 @@ public class GoogleGeocodeService {
             url = url.concat("&address=" + query);
 
         CustomResponseDTO responseDTO = new CustomResponseDTO();
-        JSONObject dataJson = new JSONObject(getDataJson(url));
-        if (dataJson.has("error_message")) {
-            if (dataJson.getString("status").equals(ErrorCodes.GOOGLE_KEY_MISSING))
-                responseDTO.setError("Google Geocode API key is invalid");
+        String dataUrl = "";
+        dataUrl = getDataJson(url);
+        if (dataUrl.contains("error_message")) {
+            responseDTO.setError("Google Geocode API key is invalid");
             return responseDTO;
         }
+        JSONObject dataJson = new JSONObject(dataUrl);
 
         JSONArray resultArray = dataJson.getJSONArray("results");
         List<VenuesDTO> venuesDTOList = new ArrayList<>();
