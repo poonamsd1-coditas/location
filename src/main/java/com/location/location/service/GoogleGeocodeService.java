@@ -91,7 +91,12 @@ public class GoogleGeocodeService {
     }
 
     public String getGoogleUrl() {
-        return applicationProperties.getGoogleGeocode().getApiPath() +
-                "?key=" + applicationProperties.getGoogleGeocode().getGoogleKey();
+        String apiPath = null, googleKey = null;
+        if (applicationProperties.getGoogleGeocode() != null) {
+            apiPath = applicationProperties.getGoogleGeocode().getApiPath();
+            googleKey = applicationProperties.getGoogleGeocode().getGoogleKey();
+        }
+        return apiPath +
+                "?key=" + googleKey;
     }
 }

@@ -100,7 +100,7 @@ public class FourSquareService {
         else if (responseDTO.getStatus().equals(HttpStatus.BAD_REQUEST))
             responseDTO.setMessage(ErrorCodes.FAILED_GEOCODE);
         else if (responseDTO.getStatus().equals(HttpStatus.UNAUTHORIZED))
-            responseDTO.setMessage(ErrorCodes.FAILED_GEOCODE);
+            responseDTO.setMessage(ErrorCodes.INVALID_AUTH);
         return responseDTO;
     }
 
