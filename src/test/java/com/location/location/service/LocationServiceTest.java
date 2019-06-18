@@ -113,6 +113,21 @@ public class LocationServiceTest {
     }
 
     @Test
+    public void testGooglePlaceNotFound() {
+        String mockData = "{\"results\":[],\"status\":\"ZERO_RESULTS\"}";
+        responseEntity = new ResponseEntity<>(mockData, HttpStatus.ACCEPTED);
+        when(restTemplate.exchange(
+                ArgumentMatchers.anyString(),
+                ArgumentMatchers.any(HttpMethod.class),
+                ArgumentMatchers.any(),
+                ArgumentMatchers.<Class<String>>any()
+        )).thenReturn(responseEntity);
+        CustomResponseDTO responseDTO = googleGeocodeService.getLocation("32dshfbsd", "Building");
+        List<VenuesDTO> locations = responseDTO.getLocations();
+        assertTrue("Return empty list of places", CollectionUtils.isEmpty(locations));
+    }
+
+    @Test
     public void testGoogleInvalidKey() {
         String mockData = "{\"error_message\": \"The provided API key is invalid.\",\"results\": [],\"status\": \"REQUEST_DENIED\"}";
         responseEntity = new ResponseEntity<>(mockData, HttpStatus.UNAUTHORIZED);
