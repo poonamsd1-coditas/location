@@ -23,10 +23,8 @@ public class FourSquareController {
     @GetMapping("/getLocation")
     public ResponseEntity<CustomResponseDTO> getLocation(@RequestParam(value = "query", required = true) String query,
                                                          @RequestParam(value = "filter", required = false) String filter) {
-
-        return new ResponseEntity<>(fourSquareService.getLocation(query, filter), HttpStatus.OK);
-
-
+        CustomResponseDTO responseDTO = fourSquareService.getLocation(query, filter);
+        return new ResponseEntity<>(responseDTO, responseDTO.getStatus());
     }
 
 }

@@ -9,10 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -44,9 +41,9 @@ public class FourSquareService {
         String dataUrl = null;
         try {
             dataUrl = getDataJson(url);
-        }catch (Exception e) {
-            responseDTO.setError("FourSquare couldn't get geocode param");
-            return responseDTO;
+        }catch (HttpClientErrorException e) {
+            responseDTO.setStatus(e.getStatusCode());
+            return getResponse(responseDTO);
         }
 
         JSONObject dataJson = new JSONObject(dataUrl);
@@ -92,7 +89,18 @@ public class FourSquareService {
             venuesDTO.setCategory(categoryList);
             venuesDTOList.add(venuesDTO);
         }
+        responseDTO.setStatus(HttpStatus.OK);
         responseDTO.setLocations(venuesDTOList);
+        return getResponse(responseDTO);
+    }
+
+    public CustomResponseDTO getResponse(CustomResponseDTO responseDTO) {
+        if (responseDTO.getStatus().equals(HttpStatus.OK))
+            responseDTO.setMessage(ErrorCodes.LOCATION_POPULATED);
+        else if (responseDTO.getStatus().equals(HttpStatus.BAD_REQUEST))
+            responseDTO.setMessage(ErrorCodes.FAILED_GEOCODE);
+        else if (responseDTO.getStatus().equals(HttpStatus.UNAUTHORIZED))
+            responseDTO.setMessage(ErrorCodes.FAILED_GEOCODE);
         return responseDTO;
     }
 
@@ -104,9 +112,15 @@ public class FourSquareService {
     }
 
     private String getFourSquareUrl() {
-        return applicationProperties.getFourSquare().getApiPath() +
-                "?client_id=" + applicationProperties.getFourSquare().getClientId() +
-                "&client_secret=" + applicationProperties.getFourSquare().getClientSecret() +
+        String apiPath = null, clientSecret = null, clientId = null;
+        if (applicationProperties.getFourSquare() != null) {
+            apiPath = applicationProperties.getFourSquare().getApiPath();
+            clientId = applicationProperties.getFourSquare().getClientId();
+            clientSecret = applicationProperties.getFourSquare().getClientSecret();
+        }
+        return apiPath +
+                "?client_id=" + clientId +
+                "&client_secret=" + clientSecret +
                 "&intent=browse&v=" + new SimpleDateFormat("yyyyMMdd").format(new Date());
     }
 

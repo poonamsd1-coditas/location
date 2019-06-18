@@ -7,10 +7,7 @@ import com.location.location.dto.VenuesDTO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,7 +35,8 @@ public class GoogleGeocodeService {
         String dataUrl = "";
         dataUrl = getDataJson(url);
         if (dataUrl.contains("error_message")) {
-            responseDTO.setError("Google Geocode API key is invalid");
+            responseDTO.setStatus(HttpStatus.UNAUTHORIZED);
+            responseDTO.setMessage(ErrorCodes.GOOGLE_KEY_MISSING);
             return responseDTO;
         }
         JSONObject dataJson = new JSONObject(dataUrl);
@@ -79,6 +77,8 @@ public class GoogleGeocodeService {
             }
             venuesDTOList.add(venuesDTO);
         }
+        responseDTO.setStatus(HttpStatus.OK);
+        responseDTO.setMessage(ErrorCodes.LOCATION_POPULATED);
         responseDTO.setLocations(venuesDTOList);
         return responseDTO;
     }

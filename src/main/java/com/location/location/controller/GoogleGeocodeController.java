@@ -23,6 +23,7 @@ public class GoogleGeocodeController {
     @GetMapping("/getLocation")
     public ResponseEntity<CustomResponseDTO> getLocation(@RequestParam(value = "query", required = true) String query,
                                                          @RequestParam(value = "filter", required = false) String filter) {
-        return new ResponseEntity<>(googleGeocodeService.getLocation(query, filter), HttpStatus.OK);
+        CustomResponseDTO responseDTO = googleGeocodeService.getLocation(query, filter);
+        return new ResponseEntity<>(responseDTO, responseDTO.getStatus());
     }
 }
