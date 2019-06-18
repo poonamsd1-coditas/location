@@ -1,0 +1,20 @@
+logging:
+  level:
+    ROOT: INFO
+    com.location: DEBUG
+
+spring:
+  profiles:
+    active: "dev"
+
+application:
+  fourSquare:
+      clientId: KD4ZYPAGF2GMCG5XH50RIUMPBRPGJFO3DOR14ZJE35WB2OVV
+      clientSecret: B0WXOQRBJ0H5I40513U31LBB3S5TEAEKIOD1GRM0HSLN2YDC
+      apiPath: "https://api.foursquare.com/v2/venues/search"
+  googleGeocode:
+      googleKey: AIzaSyBvP_vnFFVpApbNwyTnbj4SMPTUcpZwwOo
+      apiPath: "https://maps.googleapis.com/maps/api/geocode/json"
+
+server:
+  port: 8089
