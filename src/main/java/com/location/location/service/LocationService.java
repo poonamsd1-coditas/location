@@ -7,9 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class LocationService {
@@ -25,15 +24,15 @@ public class LocationService {
         CustomResponseDTO googleResponse = googleGeocodeService.getLocation(query, filter);
 
         CustomResponseDTO mergedResponse = new CustomResponseDTO();
-        List<VenuesDTO> venuesDTOList = new ArrayList<>();
-        mergedResponse.setLocations(venuesDTOList);
+        Set<VenuesDTO> venuesDTOSet = new HashSet<>();
+        mergedResponse.setLocations(venuesDTOSet);
 
         if (foursquareResponse.getStatus().equals(HttpStatus.OK) && googleResponse.getStatus().equals(HttpStatus.OK)) {
-            venuesDTOList.addAll(foursquareResponse.getLocations());
-            venuesDTOList.addAll(googleResponse.getLocations());
+            venuesDTOSet.addAll(foursquareResponse.getLocations());
+            venuesDTOSet.addAll(googleResponse.getLocations());
             mergedResponse.setStatus(HttpStatus.OK);
             mergedResponse.setMessage(ErrorCodes.LOCATION_POPULATED);
-            mergedResponse.setLocations(venuesDTOList);
+            mergedResponse.setLocations(venuesDTOSet);
         }
         else if (foursquareResponse.getStatus().equals(HttpStatus.OK))
             mergedResponse = foursquareResponse;

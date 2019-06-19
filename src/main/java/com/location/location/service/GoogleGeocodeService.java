@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class GoogleGeocodeService {
@@ -42,7 +39,7 @@ public class GoogleGeocodeService {
         JSONObject dataJson = new JSONObject(dataUrl);
 
         JSONArray resultArray = dataJson.getJSONArray("results");
-        List<VenuesDTO> venuesDTOList = new ArrayList<>();
+        Set<VenuesDTO> venuesDTOSet = new HashSet<>();
         for (int i = 0; i < resultArray.length(); i++) {
             JSONObject resultObject = resultArray.getJSONObject(i);
             VenuesDTO venuesDTO = new VenuesDTO();
@@ -75,11 +72,11 @@ public class GoogleGeocodeService {
                 }
                 venuesDTO.setCategory(categoryList);
             }
-            venuesDTOList.add(venuesDTO);
+            venuesDTOSet.add(venuesDTO);
         }
         responseDTO.setStatus(HttpStatus.OK);
         responseDTO.setMessage(ErrorCodes.LOCATION_POPULATED);
-        responseDTO.setLocations(venuesDTOList);
+        responseDTO.setLocations(venuesDTOSet);
         return responseDTO;
     }
 

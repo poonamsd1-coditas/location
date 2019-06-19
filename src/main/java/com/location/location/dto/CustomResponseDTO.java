@@ -1,13 +1,12 @@
 package com.location.location.dto;
 
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
+import java.util.Set;
 
 public class CustomResponseDTO {
     HttpStatus status;
     String message;
-    List<VenuesDTO> locations;
+    Set<VenuesDTO> locations;
 
     public HttpStatus getStatus() {
         return status;
@@ -25,11 +24,11 @@ public class CustomResponseDTO {
         this.message = message;
     }
 
-    public List<VenuesDTO> getLocations() {
+    public Set<VenuesDTO> getLocations() {
         return locations;
     }
 
-    public void setLocations(List<VenuesDTO> locations) {
+    public void setLocations(Set<VenuesDTO> locations) {
         this.locations = locations;
     }
 }

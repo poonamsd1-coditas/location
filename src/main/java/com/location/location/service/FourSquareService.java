@@ -15,10 +15,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class FourSquareService {
@@ -50,7 +47,7 @@ public class FourSquareService {
 
         JSONObject responseJson = (JSONObject) dataJson.get("response");
         JSONArray venuesArray = (JSONArray) responseJson.get("venues");
-        List<VenuesDTO> venuesDTOList = new ArrayList<>();
+        Set<VenuesDTO> venuesDTOSet = new HashSet<>();
         for (int i = 0; i < venuesArray.length(); i++) {
             JSONObject venueObject = venuesArray.getJSONObject(i);
             VenuesDTO venuesDTO = new VenuesDTO();
@@ -87,10 +84,10 @@ public class FourSquareService {
             if (filterApplied && notFound)
                 continue;
             venuesDTO.setCategory(categoryList);
-            venuesDTOList.add(venuesDTO);
+            venuesDTOSet.add(venuesDTO);
         }
         responseDTO.setStatus(HttpStatus.OK);
-        responseDTO.setLocations(venuesDTOList);
+        responseDTO.setLocations(venuesDTOSet);
         return getResponse(responseDTO);
     }
 
