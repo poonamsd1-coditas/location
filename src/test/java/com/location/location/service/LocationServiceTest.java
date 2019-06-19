@@ -1,7 +1,7 @@
 package com.location.location.service;
 
 import com.location.location.config.ApplicationProperties;
-import com.location.location.config.ErrorCodes;
+import com.location.location.config.AppConstants;
 import com.location.location.dto.VenuesDTO;
 import com.location.location.dto.CustomResponseDTO;
 import com.location.location.service.impl.FourSquareService;
@@ -71,7 +71,7 @@ public class LocationServiceTest {
         CustomResponseDTO responseDTO = fourSquareService.getLocation(name, filter);
         Set<VenuesDTO> venuesDTOSet = responseDTO.getLocations();
         assertTrue("Return non empty list of places", !CollectionUtils.isEmpty(venuesDTOSet));
-        assertThat(responseDTO.getMessage().equals(ErrorCodes.LOCATION_POPULATED));
+        assertThat(responseDTO.getMessage().equals(AppConstants.LOCATION_POPULATED)).isTrue();
     }
 
     @Test
@@ -83,7 +83,7 @@ public class LocationServiceTest {
                 ArgumentMatchers.<Class<String>>any()
         )).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request"));
         CustomResponseDTO responseDTO = fourSquareService.getLocation(name, filter);
-        assertEquals("Return Error", responseDTO.getMessage(), ErrorCodes.FAILED_GEOCODE);
+        assertEquals("Return Error", responseDTO.getMessage(), AppConstants.FAILED_GEOCODE);
     }
 
     @Test
@@ -95,7 +95,7 @@ public class LocationServiceTest {
                 ArgumentMatchers.<Class<String>>any()
         )).thenThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized"));
         CustomResponseDTO responseDTO = fourSquareService.getLocation(name, filter);
-        assertEquals("Return Error", responseDTO.getMessage(), ErrorCodes.INVALID_AUTH);
+        assertEquals("Return Error", responseDTO.getMessage(), AppConstants.INVALID_AUTH);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class LocationServiceTest {
         CustomResponseDTO responseDTO = googleGeocodeService.getLocation(name,"building");
         Set<VenuesDTO> locations = responseDTO.getLocations();
         assertTrue("Return non empty list of places", !CollectionUtils.isEmpty(locations));
-        assertThat(responseDTO.getMessage().equals(ErrorCodes.LOCATION_POPULATED));
+        assertThat(responseDTO.getMessage().equals(AppConstants.LOCATION_POPULATED)).isTrue();
     }
 
     @Test
@@ -142,7 +142,7 @@ public class LocationServiceTest {
         CustomResponseDTO responseDTO = googleGeocodeService.getLocation("32dshfbsd", "Building");
         Set<VenuesDTO> locations = responseDTO.getLocations();
         assertTrue("Return empty list of places", CollectionUtils.isEmpty(locations));
-        assertEquals("Return Error", responseDTO.getMessage(), ErrorCodes.GOOGLE_KEY_MISSING);
+        assertEquals("Return Error", responseDTO.getMessage(), AppConstants.GOOGLE_KEY_MISSING);
     }
 
 }

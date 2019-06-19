@@ -2,7 +2,7 @@ package com.location.location.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.location.location.LocationApplication;
 import com.location.location.config.ApplicationProperties;
-import com.location.location.config.ErrorCodes;
+import com.location.location.config.AppConstants;
 import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
 import com.location.location.service.impl.FourSquareService;
@@ -59,8 +59,8 @@ public class LocationControllerTest {
         String content = result.getResponse().getContentAsString();
         ObjectMapper mapper = new ObjectMapper();
         CustomResponseDTO responseDTO = mapper.readValue(content, CustomResponseDTO.class);
-        assertThat(responseDTO.getMessage().equals(ErrorCodes.LOCATION_POPULATED));
-        assertThat(!responseDTO.getLocations().isEmpty());
+        assertThat(responseDTO.getMessage().equals(AppConstants.LOCATION_POPULATED)).isTrue();
+        assertThat(!responseDTO.getLocations().isEmpty()).isTrue();
     }
 
     @Test
@@ -72,10 +72,10 @@ public class LocationControllerTest {
         String content = result.getResponse().getContentAsString();
         ObjectMapper mapper = new ObjectMapper();
         CustomResponseDTO responseDTO = mapper.readValue(content, CustomResponseDTO.class);
-        assertThat(responseDTO.getMessage().equals(ErrorCodes.LOCATION_POPULATED));
-        assertThat(!responseDTO.getLocations().isEmpty());
+        assertThat(responseDTO.getMessage().equals(AppConstants.LOCATION_POPULATED)).isTrue();
+        assertThat(!responseDTO.getLocations().isEmpty()).isTrue();
         for (VenuesDTO venuesDTO : responseDTO.getLocations()) {
-            assertThat(venuesDTO.getCategory().toLowerCase().contains("bank"));
+            assertThat(venuesDTO.getCategory().toLowerCase().contains("bank")).isTrue();
         }
     }
 
@@ -87,7 +87,7 @@ public class LocationControllerTest {
         String content = result.getResponse().getContentAsString();
         ObjectMapper mapper = new ObjectMapper();
         CustomResponseDTO responseDTO = mapper.readValue(content, CustomResponseDTO.class);
-        assertThat(responseDTO.getMessage().equals(ErrorCodes.INVALID_QUERY));
-        assertThat(responseDTO.getLocations() == null);
+        assertThat(responseDTO.getMessage().equals(AppConstants.INVALID_QUERY)).isTrue();
+        assertThat(responseDTO.getLocations() == null).isTrue();
     }
 }
