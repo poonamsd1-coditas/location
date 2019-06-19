@@ -1,7 +1,7 @@
 package com.location.location.service.impl;
 
-import com.location.location.config.ApplicationProperties;
 import com.location.location.config.AppConstants;
+import com.location.location.config.ApplicationProperties;
 import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
 import com.location.location.service.GeoLocationService;
@@ -15,7 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import java.util.*;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class GoogleGeocodeService implements GeoLocationService {
@@ -30,9 +33,10 @@ public class GoogleGeocodeService implements GeoLocationService {
 
     public CustomResponseDTO getLocation(String query, String filter) {
         log.info("Request to get places for a location:{} with filters: {}", query, filter);
+        String searchString = "";
         if (!StringUtils.isEmpty(filter))
-            query = query.concat(" " + filter);
-        String url = getGoogleUrl().concat("&address=" + query);
+            searchString = query.concat(" " + filter);
+        String url = getGoogleUrl().concat("&address=" + searchString);
         CustomResponseDTO responseDTO = new CustomResponseDTO();
         String dataUrl = "";
         try {

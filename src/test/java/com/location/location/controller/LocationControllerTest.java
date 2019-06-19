@@ -1,27 +1,31 @@
 package com.location.location.controller;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.location.location.LocationApplication;
-import com.location.location.config.ApplicationProperties;
 import com.location.location.config.AppConstants;
+import com.location.location.config.ApplicationProperties;
 import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
-import com.location.location.service.impl.FourSquareService;
 import com.location.location.service.LocationService;
+import com.location.location.service.impl.FourSquareService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = LocationApplication.class)

@@ -1,16 +1,11 @@
 
 Location Application Overview:-
 The application is a location search engine that gives a list of venues that match the search query, and also allows filtering as per category or type.
-The application makes use of 2 APIs:-
-1)FourSquare API (https://api.foursquare.com/v2/venues/search?client_id={foursquareClientId}
-                  &amp;client_secret={foursquareClientSecret}&amp;v={foursquareApiVersion}&amp;near={near}&amp;intent={intent})
-2)Google Geocode API (https://maps.googleapis.com/maps/api/geocode/json?address={query}&amp;key={geocodeApiKey})
-The resulting response gives an optimised combination of the results of the above 2 APIs
-
 Installations required:-
 1)Git(https://www.atlassian.com/git/tutorials/install-git)
 2)Maven(https://maven.apache.org/download.cgi)
 3)Java 1.8(https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+4)Postman
 
 Passwords required for authorization:-
 1)FourSquare:-

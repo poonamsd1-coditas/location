@@ -1,7 +1,7 @@
 package com.location.location.service.impl;
 
-import com.location.location.config.ApplicationProperties;
 import com.location.location.config.AppConstants;
+import com.location.location.config.ApplicationProperties;
 import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
 import com.location.location.service.GeoLocationService;
