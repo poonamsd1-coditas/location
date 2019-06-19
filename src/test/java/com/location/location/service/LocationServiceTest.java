@@ -22,7 +22,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import java.util.List;
+import java.util.Set;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
@@ -67,8 +67,8 @@ public class LocationServiceTest {
                 ArgumentMatchers.<Class<String>>any()
         )).thenReturn(responseEntity);
         CustomResponseDTO responseDTO = fourSquareService.getLocation(name, filter);
-        List<VenuesDTO> venuesDTOList = responseDTO.getLocations();
-        assertTrue("Return non empty list of places", !CollectionUtils.isEmpty(venuesDTOList));
+        Set<VenuesDTO> venuesDTOSet = responseDTO.getLocations();
+        assertTrue("Return non empty list of places", !CollectionUtils.isEmpty(venuesDTOSet));
         assertThat(responseDTO.getMessage().equals(ErrorCodes.LOCATION_POPULATED));
     }
 
@@ -107,7 +107,7 @@ public class LocationServiceTest {
                 ArgumentMatchers.<Class<String>>any()
         )).thenReturn(responseEntity);
         CustomResponseDTO responseDTO = googleGeocodeService.getLocation(name,"building");
-        List<VenuesDTO> locations = responseDTO.getLocations();
+        Set<VenuesDTO> locations = responseDTO.getLocations();
         assertTrue("Return non empty list of places", !CollectionUtils.isEmpty(locations));
         assertThat(responseDTO.getMessage().equals(ErrorCodes.LOCATION_POPULATED));
     }
@@ -123,7 +123,7 @@ public class LocationServiceTest {
                 ArgumentMatchers.<Class<String>>any()
         )).thenReturn(responseEntity);
         CustomResponseDTO responseDTO = googleGeocodeService.getLocation("32dshfbsd", "Building");
-        List<VenuesDTO> locations = responseDTO.getLocations();
+        Set<VenuesDTO> locations = responseDTO.getLocations();
         assertTrue("Return empty list of places", CollectionUtils.isEmpty(locations));
     }
 
@@ -138,7 +138,7 @@ public class LocationServiceTest {
                 ArgumentMatchers.<Class<String>>any()
         )).thenReturn(responseEntity);
         CustomResponseDTO responseDTO = googleGeocodeService.getLocation("32dshfbsd", "Building");
-        List<VenuesDTO> locations = responseDTO.getLocations();
+        Set<VenuesDTO> locations = responseDTO.getLocations();
         assertTrue("Return empty list of places", CollectionUtils.isEmpty(locations));
         assertEquals("Return Error", responseDTO.getMessage(), ErrorCodes.GOOGLE_KEY_MISSING);
     }
