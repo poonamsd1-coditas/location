@@ -4,6 +4,8 @@ import com.location.location.config.ApplicationProperties;
 import com.location.location.config.ErrorCodes;
 import com.location.location.dto.VenuesDTO;
 import com.location.location.dto.CustomResponseDTO;
+import com.location.location.service.impl.FourSquareService;
+import com.location.location.service.impl.GoogleGeocodeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

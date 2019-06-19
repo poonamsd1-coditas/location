@@ -1,12 +1,11 @@
-package com.location.location.service;
+package com.location.location.service.impl;
 
 import com.location.location.config.ApplicationProperties;
 import com.location.location.config.ErrorCodes;
 import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
-import com.sun.org.omg.CORBA.ExceptionDescriptionHelper;
+import com.location.location.service.GeoLocationService;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -18,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-public class FourSquareService {
+public class FourSquareService implements GeoLocationService {
 
     @Autowired
     private ApplicationProperties applicationProperties;

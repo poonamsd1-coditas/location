@@ -1,9 +1,10 @@
-package com.location.location.service;
+package com.location.location.service.impl;
 
 import com.location.location.config.ApplicationProperties;
 import com.location.location.config.ErrorCodes;
 import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
+import com.location.location.service.GeoLocationService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 @Service
-public class GoogleGeocodeService {
+public class GoogleGeocodeService implements GeoLocationService {
 
     @Autowired
     private ApplicationProperties applicationProperties;

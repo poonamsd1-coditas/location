@@ -3,6 +3,8 @@ package com.location.location.service;
 import com.location.location.config.ErrorCodes;
 import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
+import com.location.location.service.impl.FourSquareService;
+import com.location.location.service.impl.GoogleGeocodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
