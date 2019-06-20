@@ -11,7 +11,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
@@ -51,26 +55,24 @@ public class FourSquareService implements GeoLocationService {
         CustomResponseDTO responseDTO = new CustomResponseDTO();
         String url = getFourSquareUrl().concat("&near=" + query);
         boolean filterApplied = !StringUtils.isEmpty(filter);
-        String dataUrl;
         try {
-            dataUrl = getDataJson(url);
+            String dataUrl = getDataJson(url);
             JSONObject dataJson = new JSONObject(dataUrl);
             JSONObject responseJson = (JSONObject) dataJson.get("response");
             JSONArray venuesArray = (JSONArray) responseJson.get("venues");
             Set<VenuesDTO> venuesDTOSet = new HashSet<>();
             for (int i = 0; i < venuesArray.length(); i++) {
-                VenuesDTO venuesDTO = addVenueDTO(venuesArray.getJSONObject(i), filterApplied, filter);
-                if (venuesDTO != null)
-                    venuesDTOSet.add(venuesDTO);
+                if (addVenueDTO(venuesArray.getJSONObject(i), filterApplied, filter) != null) {
+                    venuesDTOSet.add(addVenueDTO(venuesArray.getJSONObject(i), filterApplied, filter));
+                }
             }
             responseDTO.setStatus(HttpStatus.OK);
             responseDTO.setLocations(venuesDTOSet);
-            return getResponse(responseDTO);
         }catch (HttpClientErrorException e) {
             LOGGER.error("Error while searching for location", e);
             responseDTO.setStatus(e.getStatusCode());
-            return getResponse(responseDTO);
         }
+        return getResponse(responseDTO);
     }
 
     /**
@@ -91,8 +93,9 @@ public class FourSquareService implements GeoLocationService {
             venuesDTO.setCountryCode(locationObject.getString("cc"));
             venuesDTO.setPostalCode(locationObject.getString("postalCode"));
             String address = "";
-            for (int j = 0; j < locationObject.getJSONArray("formattedAddress").length(); j++)
+            for (int j = 0; j < locationObject.getJSONArray("formattedAddress").length(); j++) {
                 address = address.concat(locationObject.getJSONArray("formattedAddress").getString(j) + " ");
+            }
             venuesDTO.setAddress(address);
             if (locationObject.has(AppConstants.LAT_LNG)) {
                 venuesDTO.setLat(locationObject.getJSONArray(AppConstants.LAT_LNG).getJSONObject(0).get("lat").toString());
@@ -103,14 +106,19 @@ public class FourSquareService implements GeoLocationService {
             for (int j = 0; j < venueObject.getJSONArray(AppConstants.CATEGORIES).length(); j++) {
                 String category = venueObject.getJSONArray(AppConstants.CATEGORIES).getJSONObject(j).getString("name");
                 categoryList = categoryList.concat(category);
-                if (j < venueObject.getJSONArray(AppConstants.CATEGORIES).length() - 1)
+                if (j < venueObject.getJSONArray(AppConstants.CATEGORIES).length() - 1) {
                     categoryList = categoryList.concat(", ");
-                if (filterApplied && category.toLowerCase().contains(filter.toLowerCase()))
+                }
+                if (filterApplied && category.toLowerCase().contains(filter.toLowerCase())) {
                     notFound = false;
+                }
             }
-            if (filterApplied && notFound)
-                return null;
-            venuesDTO.setCategory(categoryList);
+            if (!filterApplied || !notFound) {
+                venuesDTO.setCategory(categoryList);
+            }
+            else {
+                venuesDTO = null;
+            }
         } catch (JSONException e) {
             LOGGER.error("Property not found");
             return null;
@@ -119,17 +127,20 @@ public class FourSquareService implements GeoLocationService {
     }
 
     /**
-     *
+     * sets appropriate error messages and status codes to customResponseDTO
      * @param responseDTO
      * @return
      */
     private CustomResponseDTO getResponse(CustomResponseDTO responseDTO) {
-        if (responseDTO.getStatus().equals(HttpStatus.OK))
+        if (responseDTO.getStatus().equals(HttpStatus.OK)) {
             responseDTO.setMessage(AppConstants.LOCATION_POPULATED);
-        else if (responseDTO.getStatus().equals(HttpStatus.BAD_REQUEST))
+        }
+        else if (responseDTO.getStatus().equals(HttpStatus.BAD_REQUEST)) {
             responseDTO.setMessage(AppConstants.FAILED_GEOCODE);
-        else if (responseDTO.getStatus().equals(HttpStatus.UNAUTHORIZED))
+        }
+        else if (responseDTO.getStatus().equals(HttpStatus.UNAUTHORIZED)) {
             responseDTO.setMessage(AppConstants.INVALID_AUTH);
+        }
         return responseDTO;
     }
 

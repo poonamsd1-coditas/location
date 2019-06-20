@@ -10,7 +10,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
@@ -42,16 +46,16 @@ public class GoogleGeocodeService implements GeoLocationService {
      * @param filter -- filter by category or type
      * @return List of venuesDTO in CustomResponseDTO
      */
-    public CustomResponseDTO getLocation(String query, String filter) {
+    public CustomResponseDTO getLocation(final String query, final String filter) {
         LOGGER.info("Request to Google Geocode to get places for a location:{} with filters: {}", query, filter);
-        String searchString = "";
-        if (!StringUtils.isEmpty(filter))
+        String searchString = query;
+        if (!StringUtils.isEmpty(filter)) {
             searchString = query.concat(" " + filter);
+        }
         String url = getGoogleUrl().concat("&address=" + searchString);
         CustomResponseDTO responseDTO = new CustomResponseDTO();
-        String dataUrl = "";
         try {
-            dataUrl = getDataJson(url);
+            String dataUrl = getDataJson(url);
             JSONObject dataJson = new JSONObject(dataUrl);
             JSONArray resultArray = dataJson.getJSONArray("results");
             Set<VenuesDTO> venuesDTOSet = new HashSet<>();
@@ -62,13 +66,12 @@ public class GoogleGeocodeService implements GeoLocationService {
             responseDTO.setStatus(HttpStatus.OK);
             responseDTO.setMessage(AppConstants.LOCATION_POPULATED);
             responseDTO.setLocations(venuesDTOSet);
-            return responseDTO;
         }catch(HttpClientErrorException e) {
             LOGGER.error("Error while searching for location", e);
             responseDTO.setStatus(HttpStatus.UNAUTHORIZED);
             responseDTO.setMessage(AppConstants.GOOGLE_KEY_MISSING);
-            return responseDTO;
         }
+        return responseDTO;
     }
 
     /**
@@ -77,23 +80,26 @@ public class GoogleGeocodeService implements GeoLocationService {
      * @param resultObject
      * @return VenuesDTO
      */
-    private VenuesDTO addVenueDTO(JSONObject resultObject) {
+    private VenuesDTO addVenueDTO(final JSONObject resultObject) {
         VenuesDTO venuesDTO = new VenuesDTO();
-        JSONArray addressComponentsJson = resultObject.getJSONArray("address_components");
-        for (int j = 0; j < addressComponentsJson.length(); j++) {
-            JSONObject jsonObject = addressComponentsJson.getJSONObject(j);
-            venuesDTO.setName(addressComponentsJson.getJSONObject(0).getString(AppConstants.LONG_NAME));
+        JSONArray addressComponents = resultObject.getJSONArray("address_components");
+        for (int j = 0; j < addressComponents.length(); j++) {
+            JSONObject jsonObject = addressComponents.getJSONObject(j);
+            venuesDTO.setName(addressComponents.getJSONObject(0).getString(AppConstants.LONG_NAME));
             if(jsonObject.getJSONArray(AppConstants.TYPES).toString().contains("administrative_area_level_2") ||
-                    jsonObject.getJSONArray(AppConstants.TYPES).toString().contains("locality"))
+                    jsonObject.getJSONArray(AppConstants.TYPES).toString().contains("locality")) {
                 venuesDTO.setCity(jsonObject.getString(AppConstants.LONG_NAME));
-            if(jsonObject.getJSONArray(AppConstants.TYPES).toString().contains("administrative_area_level_1"))
+            }
+            if(jsonObject.getJSONArray(AppConstants.TYPES).toString().contains("administrative_area_level_1")) {
                 venuesDTO.setState(jsonObject.getString(AppConstants.LONG_NAME));
+            }
             if(jsonObject.getJSONArray(AppConstants.TYPES).toString().contains("country")) {
                 venuesDTO.setCountry(jsonObject.getString(AppConstants.LONG_NAME));
                 venuesDTO.setCountryCode(jsonObject.getString("short_name"));
             }
-            if (jsonObject.getJSONArray(AppConstants.TYPES).toString().contains("postal_code"))
+            if (jsonObject.getJSONArray(AppConstants.TYPES).toString().contains("postal_code")) {
                 venuesDTO.setPostalCode(jsonObject.getString(AppConstants.LONG_NAME));
+            }
             venuesDTO.setAddress(resultObject.getString("formatted_address"));
             JSONObject locationObject = resultObject.getJSONObject("geometry").getJSONObject("location");
             venuesDTO.setLat(locationObject.get("lat").toString());
@@ -102,8 +108,9 @@ public class GoogleGeocodeService implements GeoLocationService {
             for (int k = 0; k < resultObject.getJSONArray(AppConstants.TYPES).length(); k++) {
                 String category = resultObject.getJSONArray(AppConstants.TYPES).getString(k);
                 categoryList = categoryList.concat(category);
-                if (k < resultObject.getJSONArray(AppConstants.TYPES).length() - 1)
+                if (k < resultObject.getJSONArray(AppConstants.TYPES).length() - 1) {
                     categoryList = categoryList.concat(", ");
+                }
             }
             venuesDTO.setCategory(categoryList);
         }
@@ -116,7 +123,7 @@ public class GoogleGeocodeService implements GeoLocationService {
      * @param url -- API URL
      * @return location data
      */
-    private String getDataJson(String url) {
+    private String getDataJson(final String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         HttpEntity<String> entity = new HttpEntity<>(headers);

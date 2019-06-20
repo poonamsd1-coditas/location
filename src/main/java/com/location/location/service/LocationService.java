@@ -48,15 +48,11 @@ public class LocationService {
             mergedResponse.setMessage(AppConstants.LOCATION_POPULATED);
             mergedResponse.setLocations(venuesDTOSet);
         }
-        else if (foursquareResponse.getStatus().equals(HttpStatus.OK))
+        else if (foursquareResponse.getStatus().equals(HttpStatus.OK)) {
             mergedResponse = foursquareResponse;
-        else if (googleResponse.getStatus().equals(HttpStatus.OK))
-            mergedResponse = googleResponse;
+        }
         else {
-            LOGGER.error("No locations populated");
-            mergedResponse.setStatus(HttpStatus.BAD_REQUEST);
-            mergedResponse.setMessage(AppConstants.LOCATION_NOT_POPULATED);
-            return new ResponseEntity<>(mergedResponse, mergedResponse.getStatus());
+            mergedResponse = googleResponse;
         }
         return new ResponseEntity<>(mergedResponse, mergedResponse.getStatus());
     }

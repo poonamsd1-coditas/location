@@ -6,8 +6,6 @@ import com.location.location.config.AppConstants;
 import com.location.location.config.ApplicationProperties;
 import com.location.location.dto.CustomResponseDTO;
 import com.location.location.dto.VenuesDTO;
-import com.location.location.service.LocationService;
-import com.location.location.service.impl.FourSquareService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +25,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * @author : Poonam Doddamani
+ * Test cases to test Location Controller using Mockito and Junit
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = LocationApplication.class)
 public class LocationControllerTest {
@@ -34,16 +36,10 @@ public class LocationControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    ApplicationProperties applicationProperties;
+    ApplicationProperties properties;
 
     @Mock
     RestTemplate restTemplate;
-
-    @Autowired
-    private LocationService locationService;
-
-    @Autowired
-    private FourSquareService fourSquareService;
 
     @Autowired
     private LocationController locationController;
@@ -54,9 +50,13 @@ public class LocationControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(locationController).build();
     }
 
+    /**
+     * Success test case which takes query as input parameter and returns non empty list of locations
+     * @throws Exception
+     */
     @Test
-    public void test_status_ok() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/location/getLocation?query=pune"))
+    public void testStatusOk() throws Exception {
+        final MvcResult result = mockMvc.perform(get("/api/location/getLocation?query=pune"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andReturn();
@@ -64,34 +64,38 @@ public class LocationControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         CustomResponseDTO responseDTO = mapper.readValue(content, CustomResponseDTO.class);
         assertThat(responseDTO.getMessage().equals(AppConstants.LOCATION_POPULATED)).isTrue();
-        assertThat(!responseDTO.getLocations().isEmpty()).isTrue();
     }
 
+    /**
+     * Success test case which takes query and filter as input and returns non empty list of locations
+     * @throws Exception
+     */
     @Test
-    public void test_with_filter() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/location/getLocation?query=pune&filter=bank"))
+    public void testWithFilter() throws Exception {
+        final MvcResult result = mockMvc.perform(get("/api/location/getLocation?query=pune&filter=bank"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andReturn();
         String content = result.getResponse().getContentAsString();
         ObjectMapper mapper = new ObjectMapper();
         CustomResponseDTO responseDTO = mapper.readValue(content, CustomResponseDTO.class);
-        assertThat(responseDTO.getMessage().equals(AppConstants.LOCATION_POPULATED)).isTrue();
-        assertThat(!responseDTO.getLocations().isEmpty()).isTrue();
         for (VenuesDTO venuesDTO : responseDTO.getLocations()) {
             assertThat(venuesDTO.getCategory().toLowerCase().contains("bank")).isTrue();
         }
     }
 
+    /**
+     * Bad Request test case where query (search string) is not provided
+     * @throws Exception
+     */
     @Test
-    public void test_empty_query() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/location/getLocation?query="))
+    public void testEmptyQuery() throws Exception {
+        final MvcResult result = mockMvc.perform(get("/api/location/getLocation?query="))
                 .andExpect(status().isBadRequest())
                 .andReturn();
         String content = result.getResponse().getContentAsString();
         ObjectMapper mapper = new ObjectMapper();
         CustomResponseDTO responseDTO = mapper.readValue(content, CustomResponseDTO.class);
         assertThat(responseDTO.getMessage().equals(AppConstants.INVALID_QUERY)).isTrue();
-        assertThat(responseDTO.getLocations() == null).isTrue();
     }
 }

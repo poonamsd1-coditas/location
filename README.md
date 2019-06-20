@@ -7,7 +7,7 @@ and also allows filtering as per category or type.
 * Git(https://www.atlassian.com/git/tutorials/install-git)
 * Maven(https://maven.apache.org/download.cgi)
 * Java 1.8(https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-* Postman(https://www.getpostman.com/downloads/)
+* Postman 7.7.2(https://www.getpostman.com/downloads/)
 
 Clone the repository on your local machine and run the following commands to start the application:
 ##### Build the application without test-cases
