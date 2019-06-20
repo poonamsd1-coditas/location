@@ -17,15 +17,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author : Poonam Doddamani
@@ -60,19 +58,35 @@ public class FourSquareService implements GeoLocationService {
             JSONObject dataJson = new JSONObject(dataUrl);
             JSONObject responseJson = (JSONObject) dataJson.get("response");
             JSONArray venuesArray = (JSONArray) responseJson.get("venues");
+            String response = "";
             Set<VenuesDTO> venuesDTOSet = new HashSet<>();
             for (int i = 0; i < venuesArray.length(); i++) {
-                if (addVenueDTO(venuesArray.getJSONObject(i), filterApplied, filter) != null) {
-                    venuesDTOSet.add(addVenueDTO(venuesArray.getJSONObject(i), filterApplied, filter));
-                }
+                response = addVenueDTO(venuesArray.getJSONObject(i), filterApplied, filter, venuesDTOSet);
             }
-            responseDTO.setStatus(HttpStatus.OK);
             responseDTO.setLocations(venuesDTOSet);
+            if (response.equals(AppConstants.PROPERTY_NOT_FOUND) && CollectionUtils.isEmpty(responseDTO.getLocations())) {
+                responseDTO.setMessage(response);
+                responseDTO.setStatus(HttpStatus.EXPECTATION_FAILED);
+            } else {
+                responseDTO.setMessage(AppConstants.LOCATION_POPULATED);
+                responseDTO.setStatus(HttpStatus.OK);
+            }
         }catch (HttpClientErrorException e) {
             LOGGER.error("Error while searching for location", e);
-            responseDTO.setStatus(e.getStatusCode());
+            if (e.getRawStatusCode() == 400) {
+                responseDTO.setStatus(HttpStatus.BAD_REQUEST);
+                responseDTO.setMessage(AppConstants.LOCATION_NOT_POPULATED);
+            }
+            else if (e.getRawStatusCode() == 401) {
+                responseDTO.setStatus(HttpStatus.UNAUTHORIZED);
+                responseDTO.setMessage(AppConstants.INVALID_AUTH);
+            }
+            else if (e.getRawStatusCode() == 500) {
+                responseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                responseDTO.setMessage(AppConstants.INTERNAL_ERROR);
+            }
         }
-        return getResponse(responseDTO);
+        return responseDTO;
     }
 
     /**
@@ -82,8 +96,9 @@ public class FourSquareService implements GeoLocationService {
      * @param filter
      * @return
      */
-    private VenuesDTO addVenueDTO(JSONObject venueObject, boolean filterApplied, String filter) {
+    private String addVenueDTO(JSONObject venueObject, boolean filterApplied, String filter, Set<VenuesDTO> venuesDTOSet) {
         VenuesDTO venuesDTO = new VenuesDTO();
+        String response = "";
         try {
             venuesDTO.setName(venueObject.getString("name"));
             JSONObject locationObject = venueObject.getJSONObject("location");
@@ -119,11 +134,12 @@ public class FourSquareService implements GeoLocationService {
             else {
                 venuesDTO = null;
             }
+            venuesDTOSet.add(venuesDTO);
         } catch (JSONException e) {
-            LOGGER.error("Property not found");
-            return null;
+            LOGGER.error("Property not found", e);
+            response = AppConstants.PROPERTY_NOT_FOUND;
         }
-        return venuesDTO;
+        return response;
     }
 
     /**

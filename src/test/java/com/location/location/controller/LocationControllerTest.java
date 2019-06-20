@@ -36,7 +36,7 @@ public class LocationControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    ApplicationProperties properties;
+    ApplicationProperties applicationProperties;
 
     @Mock
     RestTemplate restTemplate;
