@@ -36,17 +36,19 @@ public class LocationController {
     @GetMapping("/getLocation")
     public ResponseEntity<CustomResponseDTO> getLocationByPlace(@RequestParam(value = "query", required = true) String query,
                                                          @RequestParam(value = "filter", required = false) String filter) {
+        ResponseEntity<CustomResponseDTO> responseEntity;
         if (!StringUtils.isEmpty(query)) {
             LOGGER.info("Request to location service to get location");
-            return locationService.getLocation(query, filter);
+            responseEntity = locationService.getLocation(query, filter);
         }
         else {
             LOGGER.error("Invalid query entered");
             CustomResponseDTO responseDTO = new CustomResponseDTO();
             responseDTO.setStatus(HttpStatus.BAD_REQUEST);
             responseDTO.setMessage(AppConstants.INVALID_QUERY);
-            return new ResponseEntity<>(responseDTO, responseDTO.getStatus());
+            responseEntity = new ResponseEntity<>(responseDTO, responseDTO.getStatus());
         }
+        return responseEntity;
     }
 
 }

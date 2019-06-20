@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : Poonam Doddamani
@@ -61,7 +62,12 @@ public class FourSquareService implements GeoLocationService {
             String response = "";
             Set<VenuesDTO> venuesDTOSet = new HashSet<>();
             for (int i = 0; i < venuesArray.length(); i++) {
-                response = addVenueDTO(venuesArray.getJSONObject(i), filterApplied, filter, venuesDTOSet);
+                response = addVenueDTO(venuesArray.getJSONObject(i), venuesDTOSet);
+            }
+            if (filterApplied && !CollectionUtils.isEmpty(venuesDTOSet)) {
+                venuesDTOSet = venuesDTOSet.stream().filter(venuesDTO ->
+                        venuesDTO.getCategory().toLowerCase().contains(filter.toLowerCase())
+                ).collect(Collectors.toSet());
             }
             responseDTO.setLocations(venuesDTOSet);
             if (response.equals(AppConstants.PROPERTY_NOT_FOUND) && CollectionUtils.isEmpty(responseDTO.getLocations())) {
@@ -91,12 +97,11 @@ public class FourSquareService implements GeoLocationService {
 
     /**
      *
-     * @param venueObject
-     * @param filterApplied
-     * @param filter
-     * @return
+     * @param venueObject location object returned by FourSquare API
+     * @param venuesDTOSet set of locations to be added to
+     * @return response
      */
-    private String addVenueDTO(JSONObject venueObject, boolean filterApplied, String filter, Set<VenuesDTO> venuesDTOSet) {
+    private String addVenueDTO(JSONObject venueObject, Set<VenuesDTO> venuesDTOSet) {
         VenuesDTO venuesDTO = new VenuesDTO();
         String response = "";
         try {
@@ -117,23 +122,14 @@ public class FourSquareService implements GeoLocationService {
                 venuesDTO.setLng(locationObject.getJSONArray(AppConstants.LAT_LNG).getJSONObject(0).get("lng").toString());
             }
             String categoryList = "";
-            boolean notFound = true;
             for (int j = 0; j < venueObject.getJSONArray(AppConstants.CATEGORIES).length(); j++) {
                 String category = venueObject.getJSONArray(AppConstants.CATEGORIES).getJSONObject(j).getString("name");
                 categoryList = categoryList.concat(category);
                 if (j < venueObject.getJSONArray(AppConstants.CATEGORIES).length() - 1) {
                     categoryList = categoryList.concat(", ");
                 }
-                if (filterApplied && category.toLowerCase().contains(filter.toLowerCase())) {
-                    notFound = false;
-                }
             }
-            if (!filterApplied || !notFound) {
-                venuesDTO.setCategory(categoryList);
-            }
-            else {
-                venuesDTO = null;
-            }
+            venuesDTO.setCategory(categoryList);
             venuesDTOSet.add(venuesDTO);
         } catch (JSONException e) {
             LOGGER.error("Property not found", e);

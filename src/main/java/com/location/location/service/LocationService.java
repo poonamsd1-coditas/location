@@ -39,20 +39,20 @@ public class LocationService {
         CustomResponseDTO googleResponse = googleGeocodeService.getLocation(query, filter);
 
         CustomResponseDTO mergedResponse = new CustomResponseDTO();
+        mergedResponse.setStatus(HttpStatus.OK);
+        mergedResponse.setMessage(AppConstants.LOCATION_POPULATED);
         Set<VenuesDTO> venuesDTOSet = new HashSet<>();
-
-        if (foursquareResponse.getStatus().equals(HttpStatus.OK) && googleResponse.getStatus().equals(HttpStatus.OK)) {
+        if (foursquareResponse.getLocations() != null && !foursquareResponse.getLocations().isEmpty()) {
             venuesDTOSet.addAll(foursquareResponse.getLocations());
-            venuesDTOSet.addAll(googleResponse.getLocations());
-            mergedResponse.setStatus(HttpStatus.OK);
-            mergedResponse.setMessage(AppConstants.LOCATION_POPULATED);
-            mergedResponse.setLocations(venuesDTOSet);
         }
-        else if (foursquareResponse.getStatus().equals(HttpStatus.OK)) {
-            mergedResponse = foursquareResponse;
+        if (googleResponse.getLocations() != null && !googleResponse.getLocations().isEmpty()) {
+            venuesDTOSet.addAll(googleResponse.getLocations());
+        }
+        if (venuesDTOSet.isEmpty()) {
+            mergedResponse.setMessage(AppConstants.LOCATION_NOT_POPULATED);
         }
         else {
-            mergedResponse = googleResponse;
+            mergedResponse.setLocations(venuesDTOSet);
         }
         return new ResponseEntity<>(mergedResponse, mergedResponse.getStatus());
     }
