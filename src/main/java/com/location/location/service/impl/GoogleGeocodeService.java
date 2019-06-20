@@ -20,10 +20,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author : Poonam Doddamani
+ * GoogleGeocodeService implements the Google Geocode API to get a list of locations as result
+ */
 @Service
 public class GoogleGeocodeService implements GeoLocationService {
 
-    private static final Logger log = LoggerFactory.getLogger(GoogleGeocodeService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleGeocodeService.class);
 
     @Autowired
     private ApplicationProperties applicationProperties;
@@ -31,8 +35,15 @@ public class GoogleGeocodeService implements GeoLocationService {
     @Autowired
     private RestTemplate restTemplate;
 
+    /**
+     * Get list of places by Google Geocode API
+     *
+     * @param query -- search string
+     * @param filter -- filter by category or type
+     * @return List of venuesDTO in CustomResponseDTO
+     */
     public CustomResponseDTO getLocation(String query, String filter) {
-        log.info("Request to get places for a location:{} with filters: {}", query, filter);
+        LOGGER.info("Request to Google Geocode to get places for a location:{} with filters: {}", query, filter);
         String searchString = "";
         if (!StringUtils.isEmpty(filter))
             searchString = query.concat(" " + filter);
@@ -53,13 +64,19 @@ public class GoogleGeocodeService implements GeoLocationService {
             responseDTO.setLocations(venuesDTOSet);
             return responseDTO;
         }catch(HttpClientErrorException e) {
-            log.error("Error while searching for location", e);
+            LOGGER.error("Error while searching for location", e);
             responseDTO.setStatus(HttpStatus.UNAUTHORIZED);
             responseDTO.setMessage(AppConstants.GOOGLE_KEY_MISSING);
             return responseDTO;
         }
     }
 
+    /**
+     * Set location details received from response to venueDTO list
+     *
+     * @param resultObject
+     * @return VenuesDTO
+     */
     private VenuesDTO addVenueDTO(JSONObject resultObject) {
         VenuesDTO venuesDTO = new VenuesDTO();
         JSONArray addressComponentsJson = resultObject.getJSONArray("address_components");
@@ -93,6 +110,12 @@ public class GoogleGeocodeService implements GeoLocationService {
         return venuesDTO;
     }
 
+    /**
+     * Get data from service provider API
+     *
+     * @param url -- API URL
+     * @return location data
+     */
     private String getDataJson(String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -100,6 +123,10 @@ public class GoogleGeocodeService implements GeoLocationService {
         return restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
     }
 
+    /**
+     * Get API URL by fetching auth params from Application Properties
+     * @return URL
+     */
     public String getGoogleUrl() {
         String apiPath = null;
         String googleKey = null;

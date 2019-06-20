@@ -23,10 +23,15 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author : Poonam Doddamani
+ * FourSquare Service implements the FourSquare API to provide list of locations,
+ * and filters the results by category/type
+ */
 @Service
 public class FourSquareService implements GeoLocationService {
 
-    private static final Logger log = LoggerFactory.getLogger(FourSquareService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FourSquareService.class);
 
     @Autowired
     private ApplicationProperties applicationProperties;
@@ -34,8 +39,15 @@ public class FourSquareService implements GeoLocationService {
     @Autowired
     private RestTemplate restTemplate;
 
+    /**
+     * Get list of places by FourSquare API
+     *
+     * @param query -- search string
+     * @param filter -- filter by category or type
+     * @return List of VenuesDTO in CustomResponseDTO
+     */
     public CustomResponseDTO getLocation(String query, String filter) {
-        log.info("Request to get places for a location:{} with filters: {}", query, filter);
+        LOGGER.info("Request to FourSquare to get places for a location:{} with filters: {}", query, filter);
         CustomResponseDTO responseDTO = new CustomResponseDTO();
         String url = getFourSquareUrl().concat("&near=" + query);
         boolean filterApplied = !StringUtils.isEmpty(filter);
@@ -55,12 +67,19 @@ public class FourSquareService implements GeoLocationService {
             responseDTO.setLocations(venuesDTOSet);
             return getResponse(responseDTO);
         }catch (HttpClientErrorException e) {
-            log.error("Error while searching for location", e);
+            LOGGER.error("Error while searching for location", e);
             responseDTO.setStatus(e.getStatusCode());
             return getResponse(responseDTO);
         }
     }
 
+    /**
+     *
+     * @param venueObject
+     * @param filterApplied
+     * @param filter
+     * @return
+     */
     private VenuesDTO addVenueDTO(JSONObject venueObject, boolean filterApplied, String filter) {
         VenuesDTO venuesDTO = new VenuesDTO();
         try {
@@ -93,12 +112,17 @@ public class FourSquareService implements GeoLocationService {
                 return null;
             venuesDTO.setCategory(categoryList);
         } catch (JSONException e) {
-            log.error("Property not found");
+            LOGGER.error("Property not found");
             return null;
         }
         return venuesDTO;
     }
 
+    /**
+     *
+     * @param responseDTO
+     * @return
+     */
     private CustomResponseDTO getResponse(CustomResponseDTO responseDTO) {
         if (responseDTO.getStatus().equals(HttpStatus.OK))
             responseDTO.setMessage(AppConstants.LOCATION_POPULATED);
@@ -109,6 +133,12 @@ public class FourSquareService implements GeoLocationService {
         return responseDTO;
     }
 
+    /**
+     * Get data from service provider API
+     *
+     * @param url -- API URL
+     * @return location data
+     */
     private String getDataJson(String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -116,6 +146,10 @@ public class FourSquareService implements GeoLocationService {
         return restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
     }
 
+    /**
+     * Get API URL by fetching auth params from Application Properties
+     * @return URL
+     */
     private String getFourSquareUrl() {
         String apiPath = null;
         String clientId = null;

@@ -1,18 +1,13 @@
 
-Location Application Overview:-
-The application is a location search engine that gives a list of venues that match the search query, and also allows filtering as per category or type.
-Installations required:-
-1)Git(https://www.atlassian.com/git/tutorials/install-git)
-2)Maven(https://maven.apache.org/download.cgi)
-3)Java 1.8(https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-4)Postman
+# Location Application Overview:-
+The application is a location search engine that gives a list of venues that match the search query,
+and also allows filtering as per category or type.
 
-Passwords required for authorization:-
-1)FourSquare:-
-i)client_id
-ii)client_secret
-2)Google Geocode:-
-i)google api key
+# Installations required:-
+* Git(https://www.atlassian.com/git/tutorials/install-git)
+* Maven(https://maven.apache.org/download.cgi)
+* Java 1.8(https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+* Postman(https://www.getpostman.com/downloads/)
 
 Clone the repository on your local machine and run the following commands to start the application:
 ##### Build the application without test-cases
@@ -22,15 +17,17 @@ Clone the repository on your local machine and run the following commands to sta
 ##### Run tests
 ``` mvn test```
 
-Server port: 8090
+# Server port: 8090
 
-API endpoint:-
-http://localhost:8089/api/location/getLocation?query={query}?filter={filter}
-{query}(required) = Search string to find location e.g. Pune
-{filter}(optional) = Category/type to filter out the search results e.g. bank
+# API endpoint:-
+GET : http://localhost:8089/api/location/getLocation?query={query}?filter={filter}
+* {query}(required) = Search string to find location e.g. Pune
+* {filter}(optional) = Category/type to filter out the search results e.g. bank
 
-Sample output :-
-http://localhost:8089/api/location/getLocation?query=pune?filter=bank
+# Sample output :-
+The following URL can be tested on Postman and the following results can be obtained
+
+GET : http://localhost:8089/api/location/getLocation?query=pune?filter=bank
 
 {
     "status": "OK",
