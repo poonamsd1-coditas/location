@@ -143,24 +143,6 @@ public class FourSquareService implements GeoLocationService {
     }
 
     /**
-     * sets appropriate error messages and status codes to customResponseDTO
-     * @param responseDTO
-     * @return
-     */
-    private CustomResponseDTO getResponse(CustomResponseDTO responseDTO) {
-        if (responseDTO.getStatus().equals(HttpStatus.OK)) {
-            responseDTO.setMessage(AppConstants.LOCATION_POPULATED);
-        }
-        else if (responseDTO.getStatus().equals(HttpStatus.BAD_REQUEST)) {
-            responseDTO.setMessage(AppConstants.FAILED_GEOCODE);
-        }
-        else if (responseDTO.getStatus().equals(HttpStatus.UNAUTHORIZED)) {
-            responseDTO.setMessage(AppConstants.INVALID_AUTH);
-        }
-        return responseDTO;
-    }
-
-    /**
      * Get data from service provider API
      *
      * @param url -- API URL

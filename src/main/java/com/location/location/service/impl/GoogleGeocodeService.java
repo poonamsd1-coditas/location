@@ -57,19 +57,26 @@ public class GoogleGeocodeService implements GeoLocationService {
         try {
             String dataUrl = getDataJson(url);
             JSONObject dataJson = new JSONObject(dataUrl);
-            JSONArray resultArray = dataJson.getJSONArray("results");
-            Set<VenuesDTO> venuesDTOSet = new HashSet<>();
-            for (int i = 0; i < resultArray.length(); i++) {
-                JSONObject resultObject = resultArray.getJSONObject(i);
-                venuesDTOSet.add(addVenueDTO(resultObject));
+            if (dataJson.has("error_message")) {
+                LOGGER.error("Google key missing");
+                responseDTO.setStatus(HttpStatus.UNAUTHORIZED);
+                responseDTO.setMessage(AppConstants.GOOGLE_KEY_MISSING);
             }
-            responseDTO.setStatus(HttpStatus.OK);
-            responseDTO.setMessage(AppConstants.LOCATION_POPULATED);
-            responseDTO.setLocations(venuesDTOSet);
+            else {
+                JSONArray resultArray = dataJson.getJSONArray("results");
+                Set<VenuesDTO> venuesDTOSet = new HashSet<>();
+                for (int i = 0; i < resultArray.length(); i++) {
+                    JSONObject resultObject = resultArray.getJSONObject(i);
+                    venuesDTOSet.add(addVenueDTO(resultObject));
+                }
+                responseDTO.setStatus(HttpStatus.OK);
+                responseDTO.setMessage(AppConstants.LOCATION_POPULATED);
+                responseDTO.setLocations(venuesDTOSet);
+            }
         }catch(HttpClientErrorException e) {
             LOGGER.error("Error while searching for location", e);
-            responseDTO.setStatus(HttpStatus.UNAUTHORIZED);
-            responseDTO.setMessage(AppConstants.GOOGLE_KEY_MISSING);
+            responseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            responseDTO.setMessage(AppConstants.INTERNAL_ERROR);
         }
         return responseDTO;
     }
