@@ -81,7 +81,7 @@ public class FourSquareService implements GeoLocationService {
             LOGGER.error("Error while searching for location", e);
             if (e.getRawStatusCode() == 400) {
                 responseDTO.setStatus(HttpStatus.BAD_REQUEST);
-                responseDTO.setMessage(AppConstants.LOCATION_NOT_POPULATED);
+                responseDTO.setMessage(AppConstants.FAILED_GEOCODE);
             }
             else if (e.getRawStatusCode() == 401) {
                 responseDTO.setStatus(HttpStatus.UNAUTHORIZED);
